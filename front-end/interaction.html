@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Character Demo</title>
+
+    <!-- External CSS -->
+    <link href="../css/index.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Importmap for loading Three.js and other dependencies -->
+    <script type="importmap">
+        {
+            "imports": {
+              "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
+              "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+              "talkinghead": "../middleware/talkinghead.mjs"
+            }
+        }
+    </script>
+
+    <!-- Module scripts for avatar and main functionality -->
+    <script type="module" src="../virtualcharacter.js"></script>
+    <script type="module" src="../interaction.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f8fc;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 50% 50%;
+            grid-template-rows: 1fr auto auto;
+            grid-template-areas: 
+                "avatar chat"
+                "input-area input-area"
+                "buttons footer";
+            height: 100vh;
+            width: 100vw;
+            padding: 20px;
+            gap: 15px;
+        }
+
+        .header {
+            grid-area: header;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .avatar {
+            grid-area: avatar;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        #avatar {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chat {
+            grid-area: chat;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            border-bottom: 1px solid #eaeaea;
+            flex-shrink: 0;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: calc(100% - 55px); /* Header height + padding */
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            padding: 14px 18px;
+            border-radius: 18px;
+            max-width: 85%;
+            line-height: 1.5;
+            font-size: 15px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .message.agent {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #4285f4;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .text-container {
+            width: 100%;
+        }
+
+        #dialogue-text {
+            line-height: 1.5;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .highlight {
+            color: #5468ff;
+            font-weight: 500;
+        }
+
+        .form {
+            grid-area: input-area;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+        }
+
+        #form-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .large-text {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e0e5ec;
+            border-radius: 8px;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        .large-text:focus {
+            outline: none;
+            border-color: #5468ff;
+        }
+
+        .button {
+            grid-area: buttons;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .game-button, .move-button {
+            background-color: #4eba9f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(78, 186, 159, 0.3);
+        }
+
+        .game-button:hover, .move-button:hover {
+            background-color: #3da58d;
+            transform: translateY(-2px);
+        }
+
+        .game-button:active, .move-button:active {
+            transform: translateY(0);
+        }
+
+        .game-button:disabled, .move-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .form-button-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            grid-area: footer;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .skip-button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .skip-button:hover {
+            background-color: #e68a00;
+        }
+
+        #dialogue-text.show {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 40% auto auto auto auto;
+                grid-template-areas: 
+                    "avatar"
+                    "chat"
+                    "input-area"
+                    "buttons"
+                    "footer";
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .chat {
+                max-height: 300px;
+            }
+            
+            .chat-body {
+                max-height: 245px;
+            }
+            
+            .avatar {
+                height: 40vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="avatar">
+            <div id="loading"></div>
+            <div id="avatar"></div> <!-- Avatar will be injected here -->
+        </div>
+
+        <div class="chat">
+            <div class="chat-header">
+                Agent Chat
+            </div>
+            <div class="chat-body" id="chat-body">
+                <!-- Agent message example -->
+                <div class="message agent" id="dialogue-text">
+                    <span class="highlight">Press the "Start" Button to start the demo.</span>
+                </div>
+                
+                <!-- Messages will be appended here dynamically -->
+            </div>
+        </div>
+
+        <div id="form" class="form">
+            <div id="form-container"></div>
+        </div>
+
+        <div class="button">
+            <div id="options-container">
+                <button id="start-btn" class="game-button">Start</button>
+            </div>
+        </div>
+
+        <div class="footer">App not working? Contact christopheryou@ufl.edu with a screenshot of your error.</div>
+    </div>
+</body>
+
+</html>

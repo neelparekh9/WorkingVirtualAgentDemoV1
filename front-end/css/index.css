@@ -1,0 +1,817 @@
+/* The grid layout */
+.container {
+    display: grid;
+    grid-template-columns: 5vw 35vw 55vw 5vw;
+    grid-template-rows: 5vh 50vh auto 25vh 5vh;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    gap: 2% 2%;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "header header header header"
+      "a-gap avatar chat b-gap"
+      "a-gap button button b-gap"
+      "a-gap form form b-gap"
+      "footer footer footer footer";
+    transition: grid-template-rows 0.3s ease-in-out, 
+                grid-template-columns 0.3s ease-in-out,
+                gap 0.3s ease-in-out;
+    background: linear-gradient(135deg, #f5f7fa, #e8efff); /* Light pastel background */
+    justify-items: center; /* Horizontally center the content */
+    align-items: center; /* Vertically center the content */
+}
+
+/* Expanding avatar when no form is present */
+.container.no-form {
+    grid-template-columns: 5vw 25vw 65vw 10vw;
+    grid-template-rows: 5vh 45vh auto 10vh 15vh;
+    gap: 1% 1%;
+    height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
+    background: linear-gradient(135deg, #f5f7fa, #e8efff); /* Pastel gradient background */
+    justify-items: center; /* Horizontally center the content */
+    align-items: center; /* Vertically center the content */
+
+    grid-template-areas:
+      "header header header header"
+      "a-gap avatar avatar b-gap"
+      "a-gap chat chat b-gap"
+      "a-gap button button b-gap"
+      "footer footer footer footer";
+}
+
+
+/* Avatar styling */
+.avatar {
+    grid-area: avatar;
+    height: 100%;
+    width: 100%;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    background-image: url('/images/zoom-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: all 0.6s ease-in-out; /* Smooth transition */
+}
+
+
+/* Animation for elements sliding in */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Chat bubble (Dialogue Box) */
+.chat {
+    grid-area: chat;
+    background: #faf8f6; /* Soft cream background */
+    padding: 5%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Soft shadow */
+    animation: fadeInUp 0.5s ease forwards;
+    overflow: visible; /* Allow elements outside the container to be shown */
+    /*height: 55%; /* Make it fill the grid area */
+    width: 95%; /* Ensure it fills the grid area */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    font-family: 'RodinHimawariPro', Arial, sans-serif; /* Use Rodin if available */
+    font-size: clamp(14px, 2.5vw, 20px); /* Dynamic font size */    
+    color: #4b4b4b;
+    margin: 0;
+    z-index: 1;
+    position: relative; /* Ensures correct positioning for child elements */
+    max-height: calc(100% - 2rem); /* Subtract padding/margins for content space */
+    overflow-y: auto; /* Allow vertical scrolling for overflowing content */
+    /* Blob shape with softer curves */
+    border-radius: 55% 45% 60% 40% / 60% 40% 45% 55%;
+    transition: border-radius 0.8s ease-in-out;
+
+    /* Animation for pulsing shadow effect */
+    animation: pulseShadow 1.5s infinite ease-in-out;
+}
+
+
+
+/* Inner container for text (defines the rectangular area within the blob) */
+.chat .text-container {
+    position: relative;
+    width: 80%; /* Adjust the width to fit within the blob */
+    height: 80%; /* Adjust the height to fit within the blob */
+    margin: auto; /* Center the text-container */
+    background: transparent; /* No background, just defining the area */
+    text-align: left;
+    max-height: 100%; /* Limit height to the chat container */
+}
+
+
+/* Name label styling */
+.chat .name-label {
+    position: absolute;
+    top: 30%;
+    left: 3%;
+    background: #3f5ba7; /* Adjust color for specific character */
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 5px 15px; /* Add more padding for button-like appearance */
+    border-radius: 15px; /* More rounded corners for button look */
+    z-index: 100;
+    font-family: 'Seurat', Arial, sans-serif; /* Use Seurat if available */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    text-transform: uppercase; /* Make the name text uppercase */
+    transform: rotate(-8deg); /* Slight tilt to match the design */
+}
+
+
+/* Name label styling */
+.alias-label {
+    position: absolute;
+    background: #c74646; /* Adjust color for specific character */
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 5px 15px; /* Add more padding for button-like appearance */
+    border-radius: 15px; /* More rounded corners for button look */
+    z-index: 100;
+    font-family: 'Seurat', Arial, sans-serif; /* Use Seurat if available */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    text-transform: uppercase; /* Make the name text uppercase */
+    transform: rotate(-5deg); /* Slight tilt to match the design */
+    left: 24vw;
+}
+
+/* Wrapper for the name tag and remember text */
+.header-wrapper {
+    display: flex;
+    flex-direction: column; /* Change to 'row' if you want side-by-side */
+    gap: 5px; /* Space between the name and the remember text */
+    margin-bottom: 10px; /* Space below the wrapper */
+}
+
+/* Remember text styling */
+.remember-text {
+    font-size: 14px;
+    color: #555;
+    text-align: left; /* Align text to the left */
+    font-family: 'Seurat', Arial, sans-serif; /* Use Seurat if available */
+}
+
+
+
+/* Add a pulsing shadow effect */
+@keyframes pulseShadow {
+    0%, 100% {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Apply the pulsing shadow to the chat */
+.chat {
+    animation: pulseShadow 1.5s infinite ease-in-out;
+}
+
+
+/* Text content inside the chat area */
+/* Chat text content inside the bubble */
+/* Dialogue text */
+
+
+
+
+.chat::-webkit-scrollbar {
+    width: 12px; /* Wider scrollbar */
+}
+
+.chat::-webkit-scrollbar-thumb {
+    background-color: #ff5722; /* Color of the scrollbar thumb */
+    border-radius: 6px; /* Rounded corners for the scrollbar */
+    border: 3px solid transparent; /* Add some padding around the scrollbar */
+    background-clip: padding-box; /* Make sure the color stays within the border */
+}
+
+.chat::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.2); /* Darker background for the scrollbar track */
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    margin-left: 10px; /* Add space between the button and the spinner */
+}
+
+.header {
+    grid-area: header; /* Assign the header area */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    font-weight: bold; /* Make the text bold */
+    font-size: 0.75rem; /* Increase the font size */
+    text-align: center; /* Ensure text alignment */
+    color: #333; /* Optional: Dark color */
+    font-family: Arial, sans-serif; /* Optional: Modern font */
+}
+
+
+/* Button Styling */
+.info-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #007BFF;
+    color: white;
+    font-size: 14px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.info-button:hover {
+    background-color: #0056b3;
+}
+
+.info-button:active {
+    background-color: #003f7f;
+}
+
+/* Modal Container */
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-container.hidden {
+    display: none;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Modal Title */
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Modal Body */
+.modal-body {
+    text-align: left;
+}
+
+/* Modal Body Items */
+.modal-body-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Modal Body Label */
+.modal-body-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Modal Body Value */
+.modal-body-value {
+    font-weight: normal;
+    color: #555;
+}
+
+/* Modal Close Button */
+.modal-close {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.modal-close:hover {
+    background-color: #0056b3;
+}
+
+.modal-close:active {
+    background-color: #003f7f;
+}
+
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* Dialogue animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+/* Review screen grid layout */
+.review-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;  /* 1 part for question, 2 parts for answer */
+    grid-gap: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.question-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.answer-value {
+    font-size: 16px;
+    color: #555;
+}
+
+
+/* Adjust the form section for better fit and scrolling */
+.form {
+    grid-area: form;
+    background-color: #fff;
+    padding: 1%;
+    border-radius: 5%;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    overflow-y: auto; /* Allow scrolling if form content exceeds height */
+    max-height: 100%; /* Ensure form does not exceed its grid area */
+    width: 60vw;
+}
+
+/* Ensure other elements fit well inside their grid areas */
+.answer-value, .question-label {
+    overflow-y: auto; /* Allow scrolling if text overflows */
+    max-height: 100%; /* Ensure content doesn't overflow the container */
+    word-wrap: break-word; /* Ensure long text breaks properly */
+}
+
+.form.hidden {
+    opacity: 0; /* Fade out the form smoothly */
+    pointer-events: none;
+    transform: scale(0.95); /* Slightly shrink before disappearing */
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 20px 0; /* Increase margin for better spacing */
+}
+
+.slider-container input[type="range"] {
+    width: 80%; /* Ensure all sliders have the same width */
+    -webkit-appearance: none;
+    height: 10px;
+    background: linear-gradient(90deg, #ff9800, #ff5722);
+    border-radius: 5px;
+    outline: none;
+}
+
+.slider-value {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+}
+
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #ff5722;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider-container span {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+}
+
+/* Options buttons */
+.button {
+    grid-area: button;
+    display: flex;
+    justify-content: center;
+}
+
+#options-container button {
+    padding: 12px 25px;
+    background-color: #6ac4bb; /* Soft pastel green */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#options-container button:hover {
+    background-color: #72b7ad;
+    transform: scale(1.05);
+}
+
+
+#options-container button:active {
+    transform: scale(0.95);
+}
+
+
+.sub-option-text {
+    font-size: 0.8em; /* Smaller font size for subtext */
+    color: #666; /* Subtle text color */
+    margin-top: 0.3em; /* Space above the subOptionText */
+    text-align: center; /* Center-align the text */
+}
+
+.button-wrapper {
+    margin-bottom: 1em;
+}
+
+.sub-option-text {
+    font-size: 0.8em; /* Smaller font size */
+    color: #666; /* Subtle text color */
+    margin-top: 0.3em; /* Space above the subOptionText */
+    text-align: center; /* Center-align the text */
+}
+
+/* Start button */
+#start-btn {
+    padding: 15px 35px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#start-btn:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+#start-btn:active {
+    transform: scale(0.95);
+}
+
+/* Footer styling */
+.footer {
+    grid-area: footer;
+    text-align: center;
+    color: #7f8fa6; /* Soft pastel blue */
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Style the form */
+
+/* Style labels */
+#form-container label {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
+}
+
+
+.form-question-wrapper {
+    margin-bottom: 15px; /* Adjust spacing between questions */
+    padding: 15px; /* Reduce padding so the questions don't take up too much space */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Subtle shadow */
+}
+
+#form-container {
+    padding-top: 2%; /* Padding at the top */
+    padding-bottom: 2%;
+    background-color: #f9f9f9;
+    border-radius: 5%;
+    max-height: 70vh; /* Limit the container height to avoid overflow */
+    overflow-y: auto; /* Allow vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    box-sizing: border-box;
+    text-align: center; /* Ensure all content centers horizontally */
+    width: 100%;
+}
+
+#form-container input,
+#form-container select,
+#form-container textarea {
+    display: block;
+    width: 90%; /* Make the inputs responsive */
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    margin-left: auto; /* Center the inputs */
+    margin-right: auto; /* Center the inputs */
+}
+/* Fun slider styling */
+.slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%; /* Make sure sliders take up most of the form's width */
+    margin: 10px 0;
+}
+
+
+#form-container .form-button-wrapper {
+    margin-top: 10px; /* Space above the button */
+}
+
+#form-container .game-button {
+    padding: 12px 25px;
+    background-color: #6ac4bb; /* Soft pastel green */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#form-container .game-button:hover {
+    background-color: #72b7ad;
+    transform: scale(1.05);
+}
+
+#form-container .game-button:active {
+    transform: scale(0.95);
+}
+
+.slider-container input[type="range"] {
+    width: 100%; /* Full width of the form */
+    max-width: 500px; /* Adjust as needed for maximum width */
+    height: 10px;
+    background: linear-gradient(90deg, #ff9800, #ff5722);
+    border-radius: 5px;
+    outline: none;
+}
+
+
+.slider-container span {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+}
+
+/* Adjusting large text inputs */
+textarea {
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box;
+}
+
+textarea.large {
+    min-height: 150px; /* Ensure large textboxes are bigger by default */
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #ff5722;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Submit button styling */
+.game-button {
+    padding: 12px 25px;
+    background-color: #6ac4bb; /* Soft pastel green */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+/* Hover effect for buttons */
+.game-button:hover {
+    background-color: #72b7ad;
+    transform: scale(1.05);
+}
+
+.game-button:active {
+    transform: scale(0.95);
+}
+
+/* Submit button styling */
+.skip-button {
+    padding: 12px 25px;
+    background-color: #ac3f3f; /* Soft pastel green */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+/* Hover effect for buttons */
+.skip-button:hover {
+    background-color: #c74646;
+    transform: scale(1.05);
+}
+
+.skip-button:active {
+    transform: scale(0.95);
+}
+
+
+#options-container .move-button {
+    padding: 12px 25px;
+    background-color: #c74646; /* Soft pastel green */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+/* Hover effect for buttons */
+#options-container .move-button:hover {
+    background-color: #ac3f3f;
+    transform: scale(1.05);
+}
+
+#options-container .move-button:active {
+    transform: scale(0.95);
+}
+
+/* Short text input */
+.short-text {
+    height: 40px;
+    resize: none; /* Disable resizing */
+    font-size: 14px;
+    padding: 10px;
+}
+
+/* Large text input */
+.large-text {
+    height: 50%; /* Larger height for more room */
+    width: 90% !important;
+    font-size: 20px;
+    padding: 15px;
+    resize: vertical; /* Allow resizing vertically if needed */
+    font-family: 'RodinHimawariPro', Arial, sans-serif; /* Use Rodin if available */
+    font-size: clamp(14px); /* Dynamic font size for the textarea text */
+    color: #4b4b4b; /* Regular text color */
+}
+
+/* Style for placeholder text */
+.large-text::placeholder {
+    font-family: 'RodinHimawariPro', Arial, sans-serif; /* Use Rodin if available */
+    font-size: clamp(14px); /* Dynamic font size */    
+    color: #9a9a9a; /* Set placeholder text color */
+    font-style: italic; /* Optional: make it italic */
+    opacity: 1; /* Ensure visibility across browsers */
+}
+
+
+/* Base styling for the multiple select element */
+select[multiple] {
+    width: 100%;         /* Full width */
+    height: auto;        /* Auto adjust height based on content */
+    padding: 10px;       /* Add padding for better UX */
+    font-size: 16px;     /* Larger text for readability */
+    border-radius: 8px;  /* Rounded corners */
+    border: 1px solid #ccc;  /* Light border */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: #f9f9f9;  /* Light background color */
+    outline: none;       /* Remove default outline */
+    appearance: none;    /* Remove default styling (for browsers) */
+    cursor: pointer;     /* Pointer cursor for better UX */
+    overflow-y: auto;    /* Enable scrolling if too many options */
+}
+
+/* Style individual options */
+select[multiple] option {
+    padding: 10px;       /* Padding for options */
+    font-size: 16px;     /* Match font size of select box */
+    background-color: #fff; /* Default background for non-selected */
+    color: #333;         /* Dark text color */
+    cursor: pointer;     /* Pointer for options */
+}
+
+/* Highlight selected options */
+select[multiple] option:checked {
+    background-color: #ff5722;  /* Custom highlight color for selected options */
+    color: white;               /* White text for contrast */
+}
+
+/* Hover effect for non-selected options */
+select[multiple] option:hover {
+    background-color: #eee;     /* Light gray background on hover */
+}
+
+/* Container for the toggle buttons */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+
+/* Base styles for the buttons */
+.toggle-button {
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect */
+.toggle-button:hover {
+    background-color: #ddd;
+}
+
+/* Styles for selected buttons */
+.toggle-button.selected {
+    background-color: #ff5722; /* Selected background color */
+    color: white; /* Selected text color */
+    border-color: #ff5722; /* Border matches background */
+}

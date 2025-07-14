@@ -1,0 +1,41 @@
+[
+    {
+        "nodeId": 1,
+        "dialogue": "Hello, what is your name?",
+        "input": {
+            "nextNode": 2
+        },
+        "options": [
+            {
+                "optionText": "I'd like to remain anonymous.",
+                "nextNode": 2
+            }
+        ]
+    },
+    {
+        "nodeId": 2,
+        "dialogue": "How are you doing today? What do you want to talk about?",
+        "input": {
+            "nextNode": 3
+        },
+        "response": {
+            "alterDialogue": true,
+            "prompt": "Greet the user based on if they've provided their name or not.",
+            "randomizedLength": false,
+            "fixedLength": 20
+        }
+    },
+    {
+        "nodeId": 3,
+        "dialogue": null,
+        "input": {
+            "nextNode": 3
+        },
+        "response": {
+            "alterDialogue": true,
+            "prompt": "Respond to the user appropriately.",
+            "randomizedLength": true
+        }
+    }
+
+]
